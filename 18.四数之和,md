@@ -1,0 +1,87 @@
+# 描述：
+给定一个包含 n 个整数的数组 nums 和一个目标值 target，判断 nums 中是否存在四个元素 a，b，c 和 d ，使得 a + b + c + d 的值与 target 相等？找出所有满足条件且不重复的四元组。
+
+注意：
+
+答案中不可以包含重复的四元组。
+
+示例：
+
+给定数组 nums = [1, 0, -1, 0, -2, 2]，和 target = 0。
+
+满足要求的四元组集合为：
+[
+  [-1,  0, 0, 1],
+  [-2, -1, 1, 2],
+  [-2,  0, 0, 2]
+]
+
+
+****
+            # 如果在这个序列中最小的几个数加起来还大于 target 那么可以直接结束了
+            if nums[i]+nums[i+1]+nums[i+2]+nums[i+3]>target:
+                break
+            # 如果在这个序列中nums[i]加上最大的三个数还小于target，那么nums[i]太小，跳出本次循环，进入下一轮nums[i]更大的循环
+            if nums[i]+nums[-1]+nums[-2]+nums[-3]<target:
+                continue
+            if i>0 and nums[i]==nums[i-1]:
+                continue
+
+加入这三个判断进行优化，可以把运行时间缩短到原来的 1/10 
+****
+
+# 双指针
+
+```python
+class Solution:
+    def fourSum(self, nums: List[int], target: int) -> List[List[int]]:
+        nums.sort()
+        length = len(nums)
+        ans = []
+        if length<4:
+            return None
+        for i in range(length-3):
+            # print(i)
+            # 如果在这个序列中最小的几个数加起来还大于 target 那么可以直接结束了
+            if nums[i]+nums[i+1]+nums[i+2]+nums[i+3]>target:
+                break
+            # 如果在这个序列中nums[i]加上最大的三个数还小于target，那么nums[i]太小，跳出本次循环，进入下一轮nums[i]更大的循环
+            if nums[i]+nums[-1]+nums[-2]+nums[-3]<target:
+                continue
+            if i>0 and nums[i]==nums[i-1]:
+                continue
+                
+            tem = nums[i+1:]
+            length_tem = len(tem)
+
+            for j in range(length_tem-2):
+
+                if nums[i]+tem[j]+tem[j+1]+tem[j+2]>target:
+                    break
+                if nums[i]+tem[j]+tem[-1]+tem[-2]<target:
+                    continue
+                if j>0 and tem[j]==tem[j-1]:
+                    continue
+                l = j+1
+                r = length_tem - 1
+                while l<r:
+                    cur_sum = nums[i]+tem[j]+tem[l]+tem[r]
+                    # print(nums[i],tem[j],tem[l],tem[r])
+                    if cur_sum<target:
+                        l+=1
+                        while l<r and tem[l]==tem[l-1]:
+                            l+=1
+                    elif cur_sum>target:
+                        r-=1
+                        while l<r and tem[r]==tem[r+1]:
+                            r-=1
+                    else:
+                        ans.append([nums[i],tem[j],tem[l],tem[r]])
+                        l+=1
+                        r-=1
+                        while l<r and tem[l] == tem[l-1]:l+=1
+                        # print(l,r)
+                        while l<r and tem[r] == tem[r+1]:r-=1
+        return ans
+        
+```
